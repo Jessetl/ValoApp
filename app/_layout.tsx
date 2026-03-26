@@ -6,8 +6,8 @@ import { AppThemeProvider } from '@/shared/infrastructure/theme';
 export default function RootLayout() {
   return (
     <AppThemeProvider>
-      <Stack>
-        <Stack.Screen name='index' options={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name='(tabs)' />
       </Stack>
     </AppThemeProvider>
   );

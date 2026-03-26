@@ -7,98 +7,114 @@ import { Platform } from 'react-native';
  */
 export const ThemeColors = {
   light: {
+    // --- Degradado de fondo (LinearGradient) ---
+    gradientStart: '#093923', // verde oscuro — parte superior
+    gradientEnd: '#94C8B5', // verde menta suave — parte inferior
+
     // --- Superficies ---
-    background: '#FAFBFC', // hsl(210, 20%, 98%) — fondo principal limpio
-    backgroundSecondary: '#F1F3F5', // hsl(210, 14%, 95%) — cards, secciones
-    backgroundTertiary: '#E9ECEF', // hsl(210, 12%, 92%) — inputs, badges deshabilitados
+    background: '#094030', // color medio del degradado para fallback
+    backgroundSecondary: '#FFFFFF', // blanco puro — cards
+    backgroundTertiary: '#F0F4F2', // gris muy claro — items dentro de cards
 
     // --- Texto ---
-    text: '#1A1D21', // hsl(216, 14%, 11%) — texto principal, alta legibilidad
-    textSecondary: '#5F6B7A', // hsl(213, 12%, 42%) — subtítulos, labels
-    textTertiary: '#8B95A3', // hsl(213, 12%, 59%) — placeholders, texto deshabilitado
-    textInverse: '#FFFFFF', // texto sobre superficies oscuras
+    text: '#FFFFFF', // blanco — títulos sobre fondo oscuro/degradado
+    textSecondary: '#718096', // gris pizarra — subtítulos, labels
+    textTertiary: '#718096', // gris pizarra — placeholders
+    textOnSurface: '#1A202C', // gris carbón — texto dentro de cards
+    textInverse: '#1A202C', // texto sobre superficies claras
 
-    // --- Primario (Azul financiero — confianza, estabilidad) ---
-    primary: '#1A6DDB', // hsl(215, 76%, 48%) — botones, links, acciones principales
-    primaryLight: '#E8F1FD', // hsl(215, 85%, 95%) — badges, backgrounds sutiles
-    primaryDark: '#0F4A99', // hsl(215, 76%, 33%) — hover, pressed states
+    // --- Primario (Verde vibrante — acción principal) ---
+    primary: '#63E696', // verde vibrante — botones, checkbox, gráficos
+    primaryLight: '#E0F8EA', // verde muy claro — badges, backgrounds sutiles
+    primaryDark: '#3FBF6E', // verde medio — hover, pressed states
 
     // --- Éxito (Verde — ganancias, ingresos, positivo) ---
-    success: '#0D8A4A', // hsl(150, 82%, 30%) — ingresos, balance positivo
-    successLight: '#E6F7EE', // hsl(150, 60%, 93%) — badge de ingreso
-    successDark: '#06663A', // hsl(150, 82%, 22%) — pressed
+    success: '#63E696', // verde vibrante — ingresos, balance positivo
+    successLight: '#E0F8EA', // verde claro — badge de ingreso
+    successDark: '#3FBF6E', // verde medio — pressed
 
-    // --- Peligro (Rojo — gastos, pérdidas, alertas) ---
-    danger: '#D42B2B', // hsl(0, 67%, 50%) — gastos, deudas, errores
-    dangerLight: '#FDE8E8', // hsl(0, 85%, 95%) — badge de gasto
-    dangerDark: '#A31F1F', // hsl(0, 67%, 38%) — pressed
-
-    // --- Advertencia (Ámbar — atención, presupuesto límite) ---
-    warning: '#D4890B', // hsl(38, 90%, 44%) — presupuesto al límite, pendientes
-    warningLight: '#FEF3E2', // hsl(38, 90%, 94%) — badge de advertencia
-    warningDark: '#9C6508', // hsl(38, 90%, 32%) — pressed
-
-    // --- Bordes y separadores ---
-    border: '#DEE2E6', // hsl(210, 14%, 89%) — bordes de cards
-    borderLight: '#E9ECEF', // hsl(210, 12%, 92%) — separadores sutiles
-    borderFocus: '#1A6DDB', // mismo que primary — focus rings
-
-    // --- Sombras (solo iOS, Android usa elevation) ---
-    shadow: '#000000',
-
-    // --- Tab bar ---
-    tint: '#1A6DDB',
-    tabIconDefault: '#8B95A3',
-    tabIconSelected: '#1A6DDB',
-
-    // --- StatusBar ---
-    statusBar: 'dark' as const,
-  },
-
-  dark: {
-    // --- Superficies ---
-    background: '#0D1117', // hsl(215, 28%, 7%) — fondo profundo, descansa la vista
-    backgroundSecondary: '#161B22', // hsl(215, 25%, 11%) — cards
-    backgroundTertiary: '#21262D', // hsl(215, 18%, 15%) — inputs, badges
-
-    // --- Texto ---
-    text: '#F0F3F6', // hsl(210, 25%, 95%) — texto principal
-    textSecondary: '#8B949E', // hsl(210, 8%, 58%) — subtítulos
-    textTertiary: '#6E7681', // hsl(215, 7%, 47%) — placeholders
-    textInverse: '#1A1D21', // texto sobre superficies claras
-
-    // --- Primario ---
-    primary: '#4A9EF5', // hsl(215, 88%, 63%) — más luminoso para contraste en dark
-    primaryLight: '#172336', // hsl(215, 45%, 15%) — badge background sutil
-    primaryDark: '#2B7FE0', // hsl(215, 76%, 53%) — pressed
-
-    // --- Éxito ---
-    success: '#2EA66B', // hsl(150, 55%, 42%) — más brillante en dark
-    successLight: '#0D2818', // hsl(150, 50%, 10%) — badge
-    successDark: '#1D8A55', // hsl(150, 65%, 33%) — pressed
-
-    // --- Peligro ---
-    danger: '#F56565', // hsl(0, 88%, 68%) — más suave, menos agresivo en dark
-    dangerLight: '#2D1515', // hsl(0, 40%, 13%) — badge
-    dangerDark: '#E04545', // hsl(0, 72%, 57%) — pressed
+    // --- Peligro / Deudas (Coral/Naranja suave) ---
+    danger: '#FF8C66', // coral naranja — gastos, deudas, botón pagar
+    dangerLight: '#FFF0EB', // coral muy claro — badge de gasto
+    dangerDark: '#E06B42', // coral oscuro — pressed
 
     // --- Advertencia ---
-    warning: '#F0A830', // hsl(38, 87%, 56%) — más luminoso
-    warningLight: '#2D2010', // hsl(38, 50%, 12%) — badge
-    warningDark: '#D4930A', // hsl(38, 90%, 44%) — pressed
+    warning: '#FFB84D', // ámbar dorado — presupuesto al límite
+    warningLight: '#FFF5E0', // ámbar claro — badge
+    warningDark: '#E09A2B', // ámbar oscuro — pressed
 
-    // --- Bordes ---
-    border: '#30363D', // hsl(215, 13%, 21%)
-    borderLight: '#21262D', // hsl(215, 18%, 15%)
-    borderFocus: '#4A9EF5', // mismo que primary
+    // --- Bordes y separadores ---
+    border: '#E2E8F0', // gris claro — bordes de cards
+    borderLight: '#EDF2F7', // gris muy claro — separadores sutiles
+    borderFocus: '#63E696', // mismo que primary — focus rings
 
     // --- Sombras ---
     shadow: '#000000',
 
     // --- Tab bar ---
-    tint: '#4A9EF5',
-    tabIconDefault: '#6E7681',
-    tabIconSelected: '#4A9EF5',
+    tint: '#093923',
+    tabIconDefault: '#94C8B5',
+    tabIconSelected: '#093923',
+    tabBarBackground: '#FFFFFF',
+    tabActiveBackground: '#093923',
+    tabActiveIcon: '#FFFFFF',
+
+    // --- StatusBar ---
+    statusBar: 'light' as const, // texto claro sobre fondo oscuro
+  },
+
+  dark: {
+    // --- Degradado de fondo (LinearGradient) ---
+    gradientStart: '#041A10', // verde muy oscuro profundo
+    gradientEnd: '#0D3D2A', // verde oscuro medio
+
+    // --- Superficies ---
+    background: '#071F14', // verde profundo — fallback
+    backgroundSecondary: '#112A1E', // verde oscuro — cards
+    backgroundTertiary: '#1A3829', // verde oscuro claro — items dentro de cards
+
+    // --- Texto ---
+    text: '#F0F4F2', // blanco verdoso — texto principal
+    textSecondary: '#8BA39A', // gris verdoso — subtítulos
+    textTertiary: '#6B8A7E', // gris verde oscuro — placeholders
+    textOnSurface: '#F0F4F2', // texto claro dentro de cards (dark)
+    textInverse: '#071F14', // texto oscuro sobre superficies claras
+
+    // --- Primario ---
+    primary: '#63E696', // verde vibrante — se mantiene en dark
+    primaryLight: '#0F2E1A', // verde oscuro — badge background sutil
+    primaryDark: '#4ACC7E', // verde medio — pressed
+
+    // --- Éxito ---
+    success: '#63E696', // verde vibrante
+    successLight: '#0F2E1A', // verde oscuro — badge
+    successDark: '#4ACC7E', // verde medio — pressed
+
+    // --- Peligro / Deudas ---
+    danger: '#FF8C66', // coral naranja — se mantiene
+    dangerLight: '#2D1A12', // coral oscuro — badge
+    dangerDark: '#FF7A4D', // coral intenso — pressed
+
+    // --- Advertencia ---
+    warning: '#FFB84D', // ámbar
+    warningLight: '#2D2210', // ámbar oscuro — badge
+    warningDark: '#E09A2B', // ámbar pressed
+
+    // --- Bordes ---
+    border: '#1E4A35', // verde oscuro medio
+    borderLight: '#163D2B', // verde oscuro
+    borderFocus: '#63E696', // mismo que primary
+
+    // --- Sombras ---
+    shadow: '#000000',
+
+    // --- Tab bar ---
+    tint: '#63E696',
+    tabIconDefault: '#6B8A7E',
+    tabIconSelected: '#63E696',
+    tabBarBackground: '#112A1E',
+    tabActiveBackground: '#63E696',
+    tabActiveIcon: '#071F14',
 
     // --- StatusBar ---
     statusBar: 'light' as const,

@@ -26,10 +26,7 @@ export const ThemeToggle = React.memo(function ThemeToggle() {
   const lastToggleAtRef = useRef(0);
   const isDark = useIsDarkMode();
   const { toggleTheme } = useThemeActions();
-  const primary = useThemeColor('primary');
-  const warning = useThemeColor('warning');
-  const backgroundSecondary = useThemeColor('backgroundSecondary');
-  const backgroundTertiary = useThemeColor('backgroundTertiary');
+  const text = useThemeColor('text');
   const rotation = useSharedValue(isDark ? 1 : 0);
 
   useEffect(() => {
@@ -79,7 +76,7 @@ export const ThemeToggle = React.memo(function ThemeToggle() {
   }));
 
   const animatedButtonStyle = useAnimatedStyle(() => ({
-    backgroundColor: isDark ? backgroundTertiary : backgroundSecondary,
+    backgroundColor: 'rgba(255,255,255,0.15)',
   }));
 
   return (
@@ -93,9 +90,9 @@ export const ThemeToggle = React.memo(function ThemeToggle() {
     >
       <Animated.View pointerEvents='none' style={animatedIconStyle}>
         {isDark ? (
-          <Moon size={ICON_SIZE} color={primary} strokeWidth={2} />
+          <Moon size={ICON_SIZE} color={text} strokeWidth={2} />
         ) : (
-          <Sun size={ICON_SIZE} color={warning} strokeWidth={2} />
+          <Sun size={ICON_SIZE} color={text} strokeWidth={2} />
         )}
       </Animated.View>
     </AnimatedPressable>
