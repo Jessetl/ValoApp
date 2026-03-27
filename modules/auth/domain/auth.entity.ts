@@ -12,3 +12,13 @@ export interface LoginCredentials {
   email: string;
   password: string;
 }
+
+/** Datos necesarios para registrar un nuevo usuario */
+export interface RegisterCredentials {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  locationLatitude: number;
+  locationLongitude: number;
+}

@@ -12,9 +12,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { isAuthenticated, user } = useAuth();
 
-  const displayName = isAuthenticated
-    ? (user?.displayName ?? user?.email?.split('@')[0] ?? 'Usuario')
-    : 'Invitado';
+  const displayName = (isAuthenticated && user?.firstName) || 'Invitado';
 
   const initial = displayName.charAt(0).toUpperCase();
 

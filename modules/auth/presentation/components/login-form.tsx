@@ -1,7 +1,6 @@
 import {
   AppButton,
   AppTextInput,
-  BottomSheetModal,
   DividerWithText,
   ErrorBanner,
   SocialButton,
@@ -9,7 +8,7 @@ import {
 import { useThemeColors } from '@/shared/presentation/hooks/use-app-theme';
 import React, { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useLogin } from '../hooks/use-login';
 
@@ -20,15 +19,17 @@ interface LoginFormValues {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-interface LoginModalProps {
-  visible: boolean;
-  onClose: () => void;
+interface LoginFormProps {
+  onSuccess: () => void;
+  onSwitchToRegister: () => void;
+  onResetRef: (reset: () => void) => void;
 }
 
-export const LoginModal = React.memo(function LoginModal({
-  visible,
-  onClose,
-}: LoginModalProps) {
+export const LoginForm = React.memo(function LoginForm({
+  onSuccess,
+  onSwitchToRegister,
+  onResetRef,
+}: LoginFormProps) {
   const colors = useThemeColors();
   const {
     control,
@@ -44,27 +45,26 @@ export const LoginModal = React.memo(function LoginModal({
     reValidateMode: 'onChange',
   });
 
-  const { isLoading, error, submitLogin, clearError } = useLogin(onClose);
+  const { isLoading, error, submitLogin, clearError } = useLogin(onSuccess);
 
   const handleFormSubmit = handleSubmit(async (values) => {
     await submitLogin(values);
   });
 
-  const handleDismiss = useCallback(() => {
-    reset();
-    clearError();
-  }, [clearError, reset]);
+  // Exponer reset al padre
+  React.useEffect(() => {
+    onResetRef(() => {
+      reset();
+      clearError();
+    });
+  }, [clearError, onResetRef, reset]);
 
   const handleSocialLogin = useCallback((provider: string) => {
     console.log(`[Auth] Inicio de sesión con ${provider}`);
   }, []);
 
   return (
-    <BottomSheetModal
-      visible={visible}
-      onClose={onClose}
-      onDismiss={handleDismiss}
-    >
+    <>
       {/* Header */}
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.textOnSurface }]}>
@@ -148,7 +148,7 @@ export const LoginModal = React.memo(function LoginModal({
             void handleFormSubmit();
           }}
           loading={isLoading}
-          style={styles.loginButton}
+          style={styles.submitButton}
         />
       </View>
 
@@ -164,7 +164,19 @@ export const LoginModal = React.memo(function LoginModal({
           onPress={handleSocialLogin}
         />
       </View>
-    </BottomSheetModal>
+
+      {/* Switch to Register */}
+      <View style={styles.switchRow}>
+        <Text style={[styles.switchText, { color: colors.textSecondary }]}>
+          ¿No tienes cuenta?
+        </Text>
+        <Pressable onPress={onSwitchToRegister}>
+          <Text style={[styles.switchLink, { color: colors.primary }]}>
+            Regístrate
+          </Text>
+        </Pressable>
+      </View>
+    </>
   );
 });
 
@@ -195,11 +207,26 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginLeft: 4,
   },
-  loginButton: {
+  submitButton: {
     marginTop: 4,
   },
   socialRow: {
     flexDirection: 'row',
     gap: 12,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 16,
+  },
+  switchText: {
+    fontSize: 14,
+    fontWeight: '400',
+  },
+  switchLink: {
+    fontSize: 14,
+    fontWeight: '700',
   },
 });

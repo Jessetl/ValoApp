@@ -4,7 +4,7 @@ import {
   ThemeProvider as NavigationThemeProvider,
 } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 
 import { ThemeColors } from './theme.constants';
@@ -16,9 +16,14 @@ interface AppThemeProviderProps {
 
 export function AppThemeProvider({ children }: AppThemeProviderProps) {
   const mode = useThemeStore((s) => s.mode);
+  const hydrateTheme = useThemeStore((s) => s.hydrateTheme);
   const systemScheme = useColorScheme();
   const colorScheme = resolveColorScheme(mode, systemScheme);
   const colors = ThemeColors[colorScheme];
+
+  useEffect(() => {
+    void hydrateTheme();
+  }, [hydrateTheme]);
 
   // Extender los temas de React Navigation con nuestros colores financieros.
   // useMemo evita recrear el objeto en cada render — solo se recalcula si cambia el scheme.

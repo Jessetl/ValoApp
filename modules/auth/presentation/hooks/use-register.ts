@@ -1,0 +1,79 @@
+import { ApiHttpError } from '@/shared/infrastructure/api';
+import { useLocationStore } from '@/shared/infrastructure/location/location.store';
+import { useCallback, useState } from 'react';
+
+import { RegisterUseCase } from '../../application/register.use-case';
+import type { RegisterCredentials } from '../../domain/auth.entity';
+import { AuthDatasource } from '../../infrastructure/auth.datasource';
+
+export interface RegisterFormValues {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface UseRegisterReturn {
+  isLoading: boolean;
+  error: string | null;
+  successMessage: string | null;
+  submitRegister: (values: RegisterFormValues) => Promise<void>;
+  clearError: () => void;
+}
+
+const registerUseCase = new RegisterUseCase(new AuthDatasource());
+
+function getRegisterErrorMessage(err: unknown): string {
+  if (err instanceof ApiHttpError) {
+    if (err.code === 'AUTH_EMAIL_ALREADY_EXISTS') {
+      return 'Este correo ya está registrado';
+    }
+    return err.message;
+  }
+  return err instanceof Error ? err.message : 'Error al crear la cuenta';
+}
+
+export function useRegister(): UseRegisterReturn {
+  const coords = useLocationStore((s) => s.coords);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const clearError = useCallback(() => setError(null), []);
+
+  const submitRegister = useCallback(
+    async (values: RegisterFormValues) => {
+      setError(null);
+      setSuccessMessage(null);
+      setIsLoading(true);
+
+      try {
+        const credentials: RegisterCredentials = {
+          ...values,
+          locationLatitude: coords?.latitude ?? 0,
+          locationLongitude: coords?.longitude ?? 0,
+        };
+
+        await registerUseCase.execute(credentials);
+
+        setSuccessMessage(
+          'Cuenta creada exitosamente. Revisa tu correo electrónico para verificar tu cuenta antes de iniciar sesión.',
+        );
+      } catch (err) {
+        setError(getRegisterErrorMessage(err));
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [coords],
+  );
+
+  return {
+    isLoading,
+    error,
+    successMessage,
+    submitRegister,
+    clearError,
+  };
+}

@@ -5,6 +5,7 @@ import type {
   AuthTokens,
   AuthUser,
   LoginCredentials,
+  RegisterCredentials,
 } from '../domain/auth.entity';
 import type { AuthPort } from '../domain/auth.port';
 
@@ -28,6 +29,13 @@ function toAuthTokens(payload: unknown): AuthTokens {
   return { idToken, refreshToken, expiresIn };
 }
 
+function toAuthSession(data: AuthApiPayload): AuthSession {
+  return {
+    tokens: toAuthTokens(data),
+    user: data.user ?? null,
+  };
+}
+
 /** Implementación del puerto de autenticación usando fetch via apiClient */
 export class AuthDatasource implements AuthPort {
   async login(credentials: LoginCredentials): Promise<AuthSession> {
@@ -36,12 +44,15 @@ export class AuthDatasource implements AuthPort {
       body: credentials,
       skipAuth: true,
     });
+    return toAuthSession(response.data);
+  }
 
-    const authData = response.data;
-    return {
-      tokens: toAuthTokens(authData),
-      user: authData.user ?? null,
-    };
+  async register(credentials: RegisterCredentials): Promise<void> {
+    await apiClient('/users/register', {
+      method: 'POST',
+      body: credentials,
+      skipAuth: true,
+    });
   }
 
   async refreshToken(refreshToken: string): Promise<AuthTokens> {
@@ -50,7 +61,6 @@ export class AuthDatasource implements AuthPort {
       body: { refreshToken },
       skipAuth: true,
     });
-
     return toAuthTokens(response.data);
   }
 }

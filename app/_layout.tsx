@@ -1,30 +1,37 @@
-import { useAuthStore } from '@/shared/infrastructure/auth/auth.store';
-import { AppThemeProvider } from '@/shared/infrastructure/theme';
-import { LoginModal } from '@/modules/auth/presentation/components/login-modal';
+import { AuthModal } from '@/modules/auth/presentation/components/auth-modal';
 import { useSessionRestore } from '@/modules/auth/presentation/hooks/use-session-restore';
+import { useAuthStore } from '@/shared/infrastructure/auth/auth.store';
+import { useLocationStore } from '@/shared/infrastructure/location/location.store';
+import { AppThemeProvider } from '@/shared/infrastructure/theme';
 import { Stack } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 
-function LoginModalGlobal() {
+function AuthModalGlobal() {
   const isVisible = useAuthStore((s) => s.isLoginModalVisible);
   const close = useAuthStore((s) => s.closeLoginModal);
 
-  return <LoginModal visible={isVisible} onClose={close} />;
+  return <AuthModal visible={isVisible} onClose={close} />;
 }
 
 function AppContent() {
   // Restaurar sesión silenciosamente al abrir la app
   useSessionRestore();
 
+  // Solicitar permisos de localización al iniciar la app
+  const requestLocation = useLocationStore((s) => s.requestLocation);
+  useEffect(() => {
+    requestLocation();
+  }, [requestLocation]);
+
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name='(tabs)' />
       </Stack>
-      <LoginModalGlobal />
+      <AuthModalGlobal />
     </>
   );
 }

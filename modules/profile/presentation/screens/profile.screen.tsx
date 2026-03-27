@@ -9,9 +9,9 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { isAuthenticated, user, logout, openLoginModal } = useAuth();
 
-  const displayName = isAuthenticated
-    ? (user?.displayName ?? user?.email?.split('@')[0] ?? 'Usuario')
-    : 'Invitado';
+  const displayName =
+    (isAuthenticated && `${user?.firstName} ${user?.lastName}`.trim()) ||
+    'Invitado';
 
   const initial = displayName.charAt(0).toUpperCase();
 

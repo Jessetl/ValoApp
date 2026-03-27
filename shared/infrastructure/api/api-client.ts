@@ -24,6 +24,7 @@ let refreshPromise: Promise<AuthTokens | null> | null = null;
 
 async function attemptRefresh(): Promise<AuthTokens | null> {
   const refreshToken = getRefreshToken();
+
   if (!refreshToken) {
     return null;
   }

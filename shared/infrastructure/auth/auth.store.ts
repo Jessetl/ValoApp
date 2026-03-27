@@ -3,11 +3,21 @@ import type {
   AuthTokens,
   AuthUser,
 } from '@/shared/domain/auth/auth.types';
-import { mmkvZustandStorage } from '@/shared/infrastructure/storage/app-storage';
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { secureStorage } from '../storage/app-storage';
+
+const AUTH_SESSION_KEY = 'auth-session';
+
+type PersistedAuthSession = {
+  isAuthenticated: boolean;
+  user: AuthUser | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+};
 
 interface AuthState {
+  /** Si el store ya terminó de hidratarse desde persistencia */
+  hasHydrated: boolean;
   /** Si el usuario está autenticado */
   isAuthenticated: boolean;
   /** Datos del usuario autenticado */
@@ -29,64 +39,110 @@ interface AuthState {
   clearSession: () => void;
   /** Marca que la restauración terminó */
   setRestoringSession: (value: boolean) => void;
+  /** Marca que la hidratación del store terminó */
+  setHasHydrated: (value: boolean) => void;
+  /** Hidrata la sesión persistida en SecureStore */
+  hydrateSession: () => Promise<void>;
   /** Abre el modal de login */
   openLoginModal: () => void;
   /** Cierra el modal de login */
   closeLoginModal: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
+export const useAuthStore = create<AuthState>()((set, get) => ({
+  hasHydrated: false,
+  isAuthenticated: false,
+  user: null,
+  accessToken: null,
+  refreshToken: null,
+  isRestoringSession: true,
+  isLoginModalVisible: false,
+
+  setSession: (session: AuthSession) => {
+    const persistedSession: PersistedAuthSession = {
+      isAuthenticated: true,
+      user: session.user ?? null,
+      accessToken: session.tokens.idToken,
+      refreshToken: session.tokens.refreshToken,
+    };
+
+    set({
+      ...persistedSession,
+      isLoginModalVisible: false,
+    });
+
+    void secureStorage.setItem(
+      AUTH_SESSION_KEY,
+      JSON.stringify(persistedSession),
+    );
+  },
+
+  updateTokens: (tokens: AuthTokens) => {
+    set({
+      accessToken: tokens.idToken,
+      refreshToken: tokens.refreshToken,
+    });
+
+    const state = get();
+    const persistedSession: PersistedAuthSession = {
+      isAuthenticated: state.isAuthenticated,
+      user: state.user,
+      accessToken: tokens.idToken,
+      refreshToken: tokens.refreshToken,
+    };
+
+    void secureStorage.setItem(
+      AUTH_SESSION_KEY,
+      JSON.stringify(persistedSession),
+    );
+  },
+
+  clearSession: () => {
+    set({
       isAuthenticated: false,
       user: null,
       accessToken: null,
       refreshToken: null,
-      isRestoringSession: true,
-      isLoginModalVisible: false,
+    });
 
-      setSession: (session: AuthSession) =>
-        set({
-          isAuthenticated: true,
-          user: session.user ?? null,
-          accessToken: session.tokens.idToken,
-          refreshToken: session.tokens.refreshToken,
-          isLoginModalVisible: false,
-        }),
+    void secureStorage.removeItem(AUTH_SESSION_KEY);
+  },
 
-      updateTokens: (tokens: AuthTokens) =>
-        set({
-          accessToken: tokens.idToken,
-          refreshToken: tokens.refreshToken,
-        }),
+  setRestoringSession: (value: boolean) => set({ isRestoringSession: value }),
 
-      clearSession: () =>
-        set({
-          isAuthenticated: false,
-          user: null,
-          accessToken: null,
-          refreshToken: null,
-        }),
+  setHasHydrated: (value: boolean) => set({ hasHydrated: value }),
 
-      setRestoringSession: (value: boolean) =>
-        set({ isRestoringSession: value }),
+  hydrateSession: async () => {
+    if (get().hasHydrated) {
+      return;
+    }
 
-      openLoginModal: () => set({ isLoginModalVisible: true }),
-      closeLoginModal: () => set({ isLoginModalVisible: false }),
-    }),
-    {
-      name: 'auth-session',
-      storage: createJSONStorage(() => mmkvZustandStorage),
-      // Solo persistir datos de sesión, no estados UI transitorios
-      partialize: (state) => ({
-        isAuthenticated: state.isAuthenticated,
-        user: state.user,
-        accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
-      }),
-    },
-  ),
-);
+    const raw = await secureStorage.getItem(AUTH_SESSION_KEY);
+
+    if (!raw) {
+      set({ hasHydrated: true });
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as PersistedAuthSession;
+
+      set({
+        isAuthenticated: parsed.isAuthenticated,
+        user: parsed.user,
+        accessToken: parsed.accessToken,
+        refreshToken: parsed.refreshToken,
+        hasHydrated: true,
+      });
+    } catch {
+      await secureStorage.removeItem(AUTH_SESSION_KEY);
+      set({ hasHydrated: true });
+    }
+  },
+
+  openLoginModal: () => set({ isLoginModalVisible: true }),
+  closeLoginModal: () => set({ isLoginModalVisible: false }),
+}));
 
 // --- Selectores para uso fuera de React (api-client, interceptors) ---
 
